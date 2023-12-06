@@ -1,3 +1,8 @@
+# Author : Sreram Vasudev
+# Date : 12/5/2023
+# Description : This program that takes in the value for the text symbol and assigns
+# the value to the new member variables.
+
 from FieldInhabitant import FieldInhabitant
 
 class Creature(FieldInhabitant):
