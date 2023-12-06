@@ -1,7 +1,7 @@
 # Author : Sreram Vasudev
 # Date : 12/5/2023
-# Description : This program that takes in the value for the text symbol and assigns
-# the value to the new member variables.
+# Description : This program gets the x and y coordinates of the creature and
+# a symbol for the creature
 
 from FieldInhabitant import FieldInhabitant
 
