@@ -1,0 +1,40 @@
+def gameOver(self):
+        print("Game Over!")
+        print("The vegetables Captain Veggie harvested:")
+        for veggie in self.captain.get_collected_veggie():
+            print(f"- {veggie.getName()}")
+        print(f"Your final score is: {self.score}")
+
+    def highScore(self):
+        high_scores = []
+
+        if os.path.exists(self._HIGHSCOREFILE):
+            with open(self._HIGHSCOREFILE, 'rb') as highscore_file:
+                high_scores = pickle.load(highscore_file)
+
+        player_initials = input("Enter your initials: ")[:3]
+
+        player_score = (player_initials, self.score)
+
+        if not high_scores:
+              high_scores.append(player_score)
+        else:
+            inserted = False
+            for i, (initials, score) in enumerate(high_scores):
+                if player_score[1] > score:
+                    high_scores.insert(i, player_score)
+                    break
+            
+            # if not inserted:
+            #     high_scores.append(player_score)
+
+        print("\nHigh Scores:")
+        print("Rank | Initials | Score")
+        print("-" * 25)
+
+        for rank, (initials, score) in enumerate(high_scores, start=1):
+            print(f"{rank:^4} | {initials:^8} | {score:^5}")
+
+        with open(self._HIGHSCOREFILE, 'wb') as highscore_file:
+            pickle.dump(high_scores, highscore_file)
+            
