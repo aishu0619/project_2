@@ -1,0 +1,163 @@
+def remainingVeggies(self):
+        all_veggies = [x.getSymbol() for x in self.vegetables]
+        remaining_veggies = 0
+        for row in self.field:
+            for item in row:
+                #while remaining_veggies <= 30:
+                remaining_veggies += 1 if item is not None and item.getSymbol() in all_veggies else 0
+            #print(all_veggies)
+
+        # remaining_veggies = sum(row.count('G')+row.count('P') + row.count('o') + row.count('B') + row.count('T')+row.count('C') for row in self.field) #sum(row.count('vegetable') for row in self.field) 
+        return remaining_veggies
+
+    def intro(self):
+        print("Welcome to the Veggie Adventure Game!")
+        print("In this game, you will navigate a field filled with vegetables, rabbits, and Captain Veggie.")
+        print("Your goal is to collect as many vegetables as possible while avoiding the rabbits.")
+        print("Let's get started!\n")
+        print("List of possible vegetables:")
+
+        for veggie in self.vegetables:
+            print(f" {veggie.getSymbol()}:  {veggie.getName()} {veggie.getPoints()}")# Display the list of possible vegetables
+        print(f"\nCaptain Veggie Symbol: {self.captain.getSymbol()}")# Display symbols for Captain Veggie and rabbits
+        print(f"Rabbit Symbol: {self.rabbits[0].getSymbol()}")
+
+
+    def printField(self):
+        rows, cols = len(self.field), len(self.field[0])
+
+#top border
+        print("+" + "-" * (cols * 5) + "+") #top border
+    # Print each row of the field
+        for row in self.field:
+            print("|", end="")  # Left border
+            for item in row:
+                if item is None:
+                    print(f"{' ':^4}|", end="")
+                else:
+                    print(f"{item.getSymbol():^4}|", end="")
+            print()
+        print("+" + "-" * (cols * 5) + "+")#bottom border
+#bottom border
+
+    def getScore(self):
+        return self.score
+
+    def moveRabbit(self):    
+        #direction = input("Enter which dorection you wanna go: ")
+        for rabbit in self.rabbits:
+            current_row, current_col = self.findObjectLocation(rabbit)
+
+      # Generate a random direction for the rabbit to move
+            direction = random.choice(["up", "down", "left", "right", "up_left", "up_right", "down_left", "down_right", "stay"])
+
+      # Calculate the new position based on the direction
+            new_row, new_col = current_row, current_col
+
+            if direction == "up":
+                new_row -= 1
+            elif direction == "down":
+                new_row += 1
+            elif direction == "left":
+                new_col -= 1
+            elif direction == "right":
+                new_col += 1
+            elif direction == "up_left":
+                new_row -= 1
+                new_col -= 1
+            elif direction == "up_right":
+                new_row -= 1
+                new_col += 1
+            elif direction == "down_left":
+                new_row += 1
+                new_col -= 1
+            elif direction == "down_right":
+                new_row += 1
+                new_col += 1
+
+        # Check if the new position is within the boundaries of the field
+            if 0 <= new_row < len(self.field) and 0 <= new_col < len(self.field[0]):
+        # Check if the new position is not occupied by another Rabbit or Captain
+                if self.field[new_row][new_col] is None or isinstance(self.field[new_row][new_col], Veggie):
+          # Remove the Veggie from the field if it's present
+                    if isinstance(self.field[new_row][new_col], Veggie):
+                        self.field[new_row][new_col] = None
+
+          # Update the Rabbit's location
+                    self.field[current_row][current_col] = None
+                    self.field[new_row][new_col] = rabbit
+                    rabbit.updateLocation(new_row, new_col)
+        # Rabbit forfeits its move if the new position is occupied
+      # Rabbit forfeits its move if the new position is outside the boundaries
+
+    def findObjectLocation(self, obj):
+        for i, row in enumerate(self.field):
+            for j, item in enumerate(row):
+                if item == obj:
+                    return i, j
+        return -1, -1
+  
+    def moveCptVertical(self, vertical_movement):
+        current_row, current_col = self.findObjectLocation(self.captain)
+        new_row = current_row + vertical_movement
+        new_col = current_col
+
+        if 0 <= new_row < len(self.field):
+            if self.field[new_row][new_col] is None:
+                self.field[current_row][current_col] = None
+                self.captain.updateLocation(new_row, new_col)
+                self.field[new_row][new_col] = self.captain
+            elif isinstance(self.field[new_row][new_col], Veggie):
+                veggie = self.field[new_row][new_col]
+                print(f"A delicious vegetable, {self.field[new_row][new_col].getName()}, has been found!")
+                self.captain.addVeggie(veggie)
+                self.score += self.field[new_row][new_col].getPoints()
+                self.field[current_row][current_col] = None
+                self.captain.updateLocation(new_row, new_col)
+                self.field[new_row][new_col] = self.captain
+            elif isinstance(self.field[new_row][new_col], Rabbit):
+                print("You should not step on the rabbits. Move canceled.")
+            else:
+                print("Invalid move. Space is occupied.")
+        else:
+            print("Invalid move. Out of bounds.")
+
+    def moveCptHorizontal(self, horizontal_movement):
+        current_row, current_col = self.findObjectLocation(self.captain)
+        new_row = current_row
+        new_col = current_col + horizontal_movement
+
+        if 0 <= new_col < len(self.field[0]):
+            if self.field[new_row][new_col] is None:
+                self.field[current_row][current_col] = None
+                self.captain.updateLocation(new_row, new_col)
+                self.field[new_row][new_col] = self.captain
+            elif isinstance(self.field[new_row][new_col], Veggie):
+                veggie = self.field[new_row][new_col]
+                print(f"A delicious vegetable, {self.field[new_row][new_col].getName()}, has been found!")
+                self.captain.addVeggie(veggie)
+                self.score += self.field[new_row][new_col].getPoints()
+                self.field[current_row][current_col] = None
+                self.captain.updateLocation(new_row, new_col)
+                self.field[new_row][new_col] = self.captain
+            elif isinstance(self.field[new_row][new_col], Rabbit):
+                print("You should not step on the rabbits. Move canceled.")
+            else:
+                print("Invalid move. Space is occupied.")
+        else:
+            print("Invalid move. Out of bounds.")
+
+    def moveCaptain(self):
+        direction = input("Enter the direction to move (W, S, A, D): ").lower()
+
+        if direction in ['w', 's', 'a', 'd']:
+            if direction == 'w':
+                self.moveCptVertical(-1)
+            elif direction == 's':
+                self.moveCptVertical(1)
+            elif direction == 'a':
+                self.moveCptHorizontal(-1)
+            elif direction == 'd':
+                self.moveCptHorizontal(1)
+        else:
+                print("Invalid input. Please enter W, S, A, or D.")
