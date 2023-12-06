@@ -1,0 +1,104 @@
+import os
+import pickle
+import random
+from Veggie import Veggie
+from Captain import Captain
+from Rabbit import Rabbit
+
+class GameEngine:
+    _NUMBEROFVEGGIES = 30
+    _NUMBEROFRABBITS = 5
+    _HIGHSCOREFILE = "highscore.data"
+
+# A function to declare appropriate member variable
+    def __init__(self):
+        self.field = []
+        self.rabbits = []
+        self.captain = None
+        self.vegetables = []
+        self.score = 0
+        
+
+    # A function to input the veggie file
+    def initVeggies(self):
+        veggie_file_name = input("Enter the name of the veggie file: ")
+
+        while not os.path.exists(veggie_file_name):
+            print(f"File '{veggie_file_name}' not found. Please enter a valid file name.")
+            veggie_file_name = input("Enter the name of the veggie file: ")
+            
+# Reading the veggie file
+        with open(veggie_file_name, 'r') as veggie_file:
+            size_line = veggie_file.readline().strip().split(",")
+
+            rows, cols = int(size_line[1]), int(size_line[2])  
+            # Read the size of the field from the first line
+            #self.field = [[None for _ in range(int(cols))] for _ in range(int(rows))]# Initialize the field with None
+            # Initialize the field with None
+            self.field = [[None for _ in range(int(cols))] for _ in range(int(rows))]
+            #self.field[row][col] = Veggie().getSymbol()
+
+# Defining the veggies
+            for line in veggie_file:
+                veggie_data = line.strip().split(",")
+                veggie_name = veggie_data[0]
+                veggie_symbol = veggie_data[1]
+                veggie_points = int(veggie_data[2])
+
+                veg = Veggie(veggie_name,veggie_symbol,veggie_points)
+                self.vegetables.append(veg)
+            number = self._NUMBEROFVEGGIES
+
+# Placing veggies.
+            for _ in range(number):# Placing veggies.
+                #veggie = random.choice(self.vegetables)
+                # print(f"veggie- {veggie}")
+                #row, col = random.randint(0, int(rows) - 1), random.randint(0, int(cols) - 1)
+
+                while number > 0: #and self.field[row][col] is None :
+                    row, col = random.randint(0, int(rows) - 1), random.randint(0, int(cols) - 1)
+                    veggie = random.choice(self.vegetables)
+                    if self.field[row][col] is None:
+                        self.field[row][col] = veggie
+                        number -= 1
+                
+                    
+
+        print("Veggies initialized successfully.")
+
+# A function to choose a random location for the Captain
+    def initCaptain(self):
+        rows, cols = len(self.field), len(self.field[0])
+
+        captain_row, captain_col = random.randint(0, rows - 1), random.randint(0, cols - 1)
+
+        while self.field[captain_row][captain_col] is not None:
+            captain_row, captain_col = random.randint(0, rows - 1), random.randint(0, cols - 1)
+
+        self.captain = Captain(rows, cols)
+        self.field[captain_row][captain_col] = self.captain
+
+        print("Captain initialized successfully.")
+
+# A function to choose random location for rabbit
+    def initRabbits(self):
+        rows, cols = len(self.field), len(self.field[0])
+
+        for _ in range(self._NUMBEROFRABBITS):
+            rabbit_row, rabbit_col = random.randint(0, rows - 1), random.randint(0, cols - 1)
+
+            while self.field[rabbit_row][rabbit_col] is not None:
+                rabbit_row, rabbit_col = random.randint(0, rows - 1), random.randint(0, cols - 1)
+
+            rabbit = Rabbit(rabbit_row, rabbit_col)
+
+            self.rabbits.append(rabbit)
+
+            self.field[rabbit_row][rabbit_col] = rabbit
+
+        print("Rabbits initialized successfully.")
+
+    def initializeGame(self):
+        self.initVeggies()
+        self.initCaptain()
+        self.initRabbits()
